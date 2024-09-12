@@ -18,20 +18,39 @@
         #gameCanvas {
             border: 1px solid black;
             max-width: 100%;
-            max-height: 80vh;
+            max-height: 70vh;
         }
         #joystick {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin-top: 20px;
             display: none;
         }
         .joystick-btn {
-            width: 60px;
-            height: 60px;
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: none;
+            background-color: #333;
+            color: white;
             font-size: 24px;
-            margin: 5px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        #upBtn { top: 0; left: 50px; }
+        #leftBtn { top: 50px; left: 0; }
+        #rightBtn { top: 50px; right: 0; }
+        #downBtn { bottom: 0; left: 50px; }
+        #centerBtn {
+            top: 50px;
+            left: 50px;
+            background-color: #555;
+            pointer-events: none;
         }
         #instructions {
             margin-top: 20px;
@@ -42,10 +61,11 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="joystick">
-        <button id="upBtn" class="joystick-btn">↑</button><br>
+        <button id="upBtn" class="joystick-btn">↑</button>
         <button id="leftBtn" class="joystick-btn">←</button>
-        <button id="rightBtn" class="joystick-btn">→</button><br>
+        <button id="rightBtn" class="joystick-btn">→</button>
         <button id="downBtn" class="joystick-btn">↓</button>
+        <button id="centerBtn" class="joystick-btn"></button>
     </div>
     <div id="instructions">
         <h2>How to Play</h2>
@@ -54,7 +74,7 @@
             <p>↑ Up | ↓ Down | ← Left | → Right</p>
         </div>
         <div id="touchInstructions" style="display: none;">
-            <p>Use the on-screen buttons to control the snake.</p>
+            <p>Use the on-screen D-pad to control the snake.</p>
         </div>
     </div>
     <script src="{{ url_for('static', filename='snake.js') }}"></script>
