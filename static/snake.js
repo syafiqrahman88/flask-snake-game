@@ -10,7 +10,7 @@ const touchInstructions = document.getElementById('touchInstructions');
 function initGame() {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight;
-    const size = Math.min(screenWidth, screenHeight) - 20;
+    const size = Math.min(screenWidth, screenHeight * 0.7) - 20; // Reduced to 70% of screen height
 
     canvas.width = size;
     canvas.height = size;
