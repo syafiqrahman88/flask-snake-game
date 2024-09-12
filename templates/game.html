@@ -77,6 +77,9 @@
             <p>Use the on-screen D-pad to control the snake.</p>
         </div>
     </div>
+    <!-- Add these hidden image elements to preload the images -->
+    <img id="snakeHeadImg" src="{{ url_for('static', filename='snake_head.png') }}" style="display: none;">
+    <img id="foodImg" src="{{ url_for('static', filename='food.png') }}" style="display: none;">
     <script src="{{ url_for('static', filename='snake.js') }}"></script>
 </body>
 </html>
