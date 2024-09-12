@@ -1,16 +1,29 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-const gridSize = 20;
-const tileCount = canvas.width / gridSize;
+let gridSize, tileCount, snake, food, dx, dy, score;
 
-let snake = [
-    {x: 10, y: 10},
-];
-let food = {x: 15, y: 15};
-let dx = 0;
-let dy = 0;
-let score = 0;
+// Add these new variables at the top of the file
+const keyboardInstructions = document.getElementById('keyboardInstructions');
+const touchInstructions = document.getElementById('touchInstructions');
+
+function initGame() {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    const size = Math.min(screenWidth, screenHeight) - 20;
+
+    canvas.width = size;
+    canvas.height = size;
+
+    gridSize = Math.floor(size / 20);
+    tileCount = Math.floor(size / gridSize);
+
+    snake = [{ x: 10, y: 10 }];
+    food = { x: 15, y: 15 };
+    dx = 0;
+    dy = 0;
+    score = 0;
+}
 
 function drawGame() {
     clearCanvas();
@@ -82,35 +95,61 @@ function drawScore() {
     ctx.fillText(`Score: ${score}`, 10, 30);
 }
 
-document.addEventListener('keydown', changeDirection);
+function changeDirection(newDx, newDy) {
+    if ((newDx === 1 && dx !== -1) || (newDx === -1 && dx !== 1) ||
+        (newDy === 1 && dy !== -1) || (newDy === -1 && dy !== 1)) {
+        dx = newDx;
+        dy = newDy;
+    }
+}
 
-function changeDirection(event) {
+document.addEventListener('keydown', handleKeyPress);
+
+function handleKeyPress(event) {
     const LEFT_KEY = 37;
     const RIGHT_KEY = 39;
     const UP_KEY = 38;
     const DOWN_KEY = 40;
 
-    const keyPressed = event.keyCode;
-    const goingUp = dy === -1;
-    const goingDown = dy === 1;
-    const goingRight = dx === 1;
-    const goingLeft = dx === -1;
+    switch (event.keyCode) {
+        case LEFT_KEY:
+            changeDirection(-1, 0);
+            break;
+        case UP_KEY:
+            changeDirection(0, -1);
+            break;
+        case RIGHT_KEY:
+            changeDirection(1, 0);
+            break;
+        case DOWN_KEY:
+            changeDirection(0, 1);
+            break;
+    }
+}
 
-    if (keyPressed === LEFT_KEY && !goingRight) {
-        dx = -1;
-        dy = 0;
-    }
-    if (keyPressed === UP_KEY && !goingDown) {
-        dx = 0;
-        dy = -1;
-    }
-    if (keyPressed === RIGHT_KEY && !goingLeft) {
-        dx = 1;
-        dy = 0;
-    }
-    if (keyPressed === DOWN_KEY && !goingUp) {
-        dx = 0;
-        dy = 1;
+// Touch controls
+const joystick = document.getElementById('joystick');
+const upBtn = document.getElementById('upBtn');
+const leftBtn = document.getElementById('leftBtn');
+const rightBtn = document.getElementById('rightBtn');
+const downBtn = document.getElementById('downBtn');
+
+// Update the setupTouchControls function
+function setupTouchControls() {
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        joystick.style.display = 'block';
+        upBtn.addEventListener('click', () => changeDirection(0, -1));
+        leftBtn.addEventListener('click', () => changeDirection(-1, 0));
+        rightBtn.addEventListener('click', () => changeDirection(1, 0));
+        downBtn.addEventListener('click', () => changeDirection(0, 1));
+        
+        // Show touch instructions, hide keyboard instructions
+        touchInstructions.style.display = 'block';
+        keyboardInstructions.style.display = 'none';
+    } else {
+        // Hide touch instructions, show keyboard instructions
+        touchInstructions.style.display = 'none';
+        keyboardInstructions.style.display = 'block';
     }
 }
 
@@ -119,4 +158,12 @@ function gameLoop() {
     setTimeout(gameLoop, 100);
 }
 
-gameLoop();
+window.addEventListener('load', () => {
+    initGame();
+    setupTouchControls();
+    gameLoop();
+});
+
+window.addEventListener('resize', () => {
+    initGame();
+});
