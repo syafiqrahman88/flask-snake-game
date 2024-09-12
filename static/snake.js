@@ -2,6 +2,11 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 let gridSize, tileCount, snake, food, dx, dy, score;
+let gameSpeed = 200; // Slower initial speed (milliseconds between updates)
+
+// Load images
+const snakeHeadImg = document.getElementById('snakeHeadImg');
+const foodImg = document.getElementById('foodImg');
 
 // Add these new variables at the top of the file
 const keyboardInstructions = document.getElementById('keyboardInstructions');
@@ -46,21 +51,39 @@ function moveSnake() {
     if (head.x === food.x && head.y === food.y) {
         score++;
         generateFood();
+        increaseSpeed(); // Increase speed when food is eaten
     } else {
         snake.pop();
     }
 }
 
 function drawSnake() {
-    ctx.fillStyle = 'green';
-    snake.forEach(segment => {
-        ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+    snake.forEach((segment, index) => {
+        if (index === 0) {
+            // Draw the head image
+            ctx.save();
+            ctx.translate(segment.x * gridSize + gridSize / 2, segment.y * gridSize + gridSize / 2);
+            ctx.rotate(getHeadRotation());
+            ctx.drawImage(snakeHeadImg, -gridSize / 2, -gridSize / 2, gridSize, gridSize);
+            ctx.restore();
+        } else {
+            // Draw body segments
+            ctx.fillStyle = 'green';
+            ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize - 2, gridSize - 2);
+        }
     });
 }
 
+function getHeadRotation() {
+    if (dx === 1) return 0;
+    if (dx === -1) return Math.PI;
+    if (dy === 1) return Math.PI / 2;
+    if (dy === -1) return -Math.PI / 2;
+    return 0;
+}
+
 function drawFood() {
-    ctx.fillStyle = 'red';
-    ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
+    ctx.drawImage(foodImg, food.x * gridSize, food.y * gridSize, gridSize, gridSize);
 }
 
 function generateFood() {
@@ -100,6 +123,12 @@ function changeDirection(newDx, newDy) {
         (newDy === 1 && dy !== -1) || (newDy === -1 && dy !== 1)) {
         dx = newDx;
         dy = newDy;
+    }
+}
+
+function increaseSpeed() {
+    if (gameSpeed > 50) {
+        gameSpeed -= 10;
     }
 }
 
@@ -155,13 +184,22 @@ function setupTouchControls() {
 
 function gameLoop() {
     drawGame();
-    setTimeout(gameLoop, 100);
+    setTimeout(gameLoop, gameSpeed);
 }
 
 window.addEventListener('load', () => {
     initGame();
     setupTouchControls();
-    gameLoop();
+    // Wait for images to load before starting the game loop
+    if (snakeHeadImg.complete && foodImg.complete) {
+        gameLoop();
+    } else {
+        snakeHeadImg.onload = foodImg.onload = () => {
+            if (snakeHeadImg.complete && foodImg.complete) {
+                gameLoop();
+            }
+        };
+    }
 });
 
 window.addEventListener('resize', () => {
